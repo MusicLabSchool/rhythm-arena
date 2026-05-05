@@ -1,1 +1,15 @@
-<!doctype html><html><head><meta charset='UTF-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/><title>Muso.ai Rhythm Arena</title><link rel='stylesheet' href='styles.css'/></head><body><div id='app'></div><script type='module' src='src/main.js'></script></body></html>
+<!doctype html>
+<html>
+<head>
+  <meta charset='UTF-8'/><meta name='viewport' content='width=device-width,initial-scale=1'/>
+  <title>Muso.ai / Music Lab Rhythm Arena</title>
+  <link rel='stylesheet' href='styles.css'/>
+</head>
+<body>
+  <div id='hud'><div id='score'>Score 0</div><div id='combo'>Combo 0</div><div id='acc'>Acc 100%</div><button id='play'>Play</button></div>
+  <canvas id='game'></canvas>
+  <div id='touch'>
+    <button data-hit='kick'>Kick</button><button data-hit='snare'>Snare</button><button data-hit='hihat'>Hi-hat</button><button data-hit='crash'>Crash</button>
+  </div>
+  <script type='module' src='app.js'></script>
+</body></html>
