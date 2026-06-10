@@ -27,11 +27,11 @@ export const DRUM_POSITIONS = {
   rightFoot:   new THREE.Vector3(-0.18, 0.07, 0.41),     // rests on kick pedal
 } as const
 
-const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08 } as const
-const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35 } as const // mahogany lacquer
-const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25 } as const
+const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08, envMapIntensity: 0.6 } as const
+const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35, envMapIntensity: 0.25 } as const // mahogany lacquer
+const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25, envMapIntensity: 0.45 } as const
 const HEAD   = { color: '#e8e2d2', roughness: 0.85, metalness: 0.0 } as const
-const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25 } as const
+const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25, envMapIntensity: 0.5 } as const
 const STICK  = { color: '#caa46a', roughness: 0.6, metalness: 0.0 } as const
 
 // ── Hand pose system ────────────────────────────────────────────────
@@ -79,8 +79,8 @@ export function DrumKit() {
   const crashRef = useRef<THREE.Group>(null)
   const hihatTopRef = useRef<THREE.Group>(null)
 
-  const kickMat = useRef<THREE.MeshStandardMaterial>(null)
-  const snareMat = useRef<THREE.MeshStandardMaterial>(null)
+  const kickMat = useRef<THREE.MeshPhysicalMaterial>(null)
+  const snareMat = useRef<THREE.MeshPhysicalMaterial>(null)
   const hihatMat = useRef<THREE.MeshStandardMaterial>(null)
   const crashMat = useRef<THREE.MeshStandardMaterial>(null)
 
@@ -158,7 +158,14 @@ export function DrumKit() {
       <group position={DRUM_POSITIONS.kick.toArray()}>
         <mesh rotation={[Math.PI / 2, 0, 0]} castShadow>
           <cylinderGeometry args={[0.46, 0.46, 0.58, 40]} />
-          <meshStandardMaterial ref={kickMat} {...SHELL} emissive="#ff5533" emissiveIntensity={0} />
+          <meshPhysicalMaterial
+            ref={kickMat}
+            {...SHELL}
+            clearcoat={0.6}
+            clearcoatRoughness={0.2}
+            emissive="#ff5533"
+            emissiveIntensity={0}
+          />
         </mesh>
         {/* Batter head (faces camera) — dark with Music Lab logo */}
         <mesh position={[0, 0, -0.293]} rotation={[0, Math.PI, 0]}>
@@ -220,7 +227,16 @@ export function DrumKit() {
 
       {/* === SNARE — steel shell on a stand === */}
       <group position={DRUM_POSITIONS.snare.toArray()}>
-        <ShellDrum radius={0.185} depth={0.12} shell={STEEL_SHELL} emissive="#4488ff" matRef={snareMat} lugs={8} />
+        <ShellDrum
+          radius={0.185}
+          depth={0.12}
+          shell={STEEL_SHELL}
+          emissive="#4488ff"
+          matRef={snareMat}
+          lugs={8}
+          clearcoat={0.4}
+          clearcoatRoughness={0.1}
+        />
         <mesh position={[0, -0.35, 0]}>
           <cylinderGeometry args={[0.009, 0.009, 0.56, 8]} />
           <meshStandardMaterial {...CHROME} />
@@ -327,20 +343,31 @@ function ShellDrum({
   emissive = '#000000',
   matRef,
   lugs = 6,
+  clearcoat = 0.5,
+  clearcoatRoughness = 0.2,
 }: {
   radius: number
   depth: number
-  shell?: { color: string; metalness: number; roughness: number }
+  shell?: { color: string; metalness: number; roughness: number; envMapIntensity?: number }
   emissive?: string
-  matRef?: React.Ref<THREE.MeshStandardMaterial>
+  matRef?: React.Ref<THREE.MeshPhysicalMaterial>
   lugs?: number
+  clearcoat?: number
+  clearcoatRoughness?: number
 }) {
   const lugAngles = Array.from({ length: lugs }, (_, i) => (i / lugs) * Math.PI * 2)
   return (
     <group>
       <mesh castShadow>
         <cylinderGeometry args={[radius, radius, depth, 32]} />
-        <meshStandardMaterial ref={matRef} {...shell} emissive={emissive} emissiveIntensity={0} />
+        <meshPhysicalMaterial
+          ref={matRef}
+          {...shell}
+          clearcoat={clearcoat}
+          clearcoatRoughness={clearcoatRoughness}
+          emissive={emissive}
+          emissiveIntensity={0}
+        />
       </mesh>
       {/* Batter head — horizontal, facing up */}
       <mesh position={[0, depth / 2 + 0.002, 0]} rotation={[-Math.PI / 2, 0, 0]}>
