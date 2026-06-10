@@ -7,11 +7,18 @@ import { RhythmHighway } from './RhythmHighway'
 import { useGameStore } from '@/store/gameStore'
 
 function CameraSetup() {
-  const { camera } = useThree()
+  const { camera, size } = useThree()
   useEffect(() => {
-    camera.position.set(0, 1.25, -2.4)
-    camera.lookAt(new THREE.Vector3(0, 0.65, 0.75))
-  }, [camera])
+    // Portrait phones crop the horizontal FOV hard — pull back and widen
+    // so the whole kit (cymbals to pedals) stays in frame.
+    const aspect = size.width / size.height
+    const portrait = aspect < 0.9
+    const cam = camera as THREE.PerspectiveCamera
+    cam.fov = portrait ? 80 : 65
+    cam.position.set(0, portrait ? 1.4 : 1.25, portrait ? -3.1 : -2.4)
+    cam.lookAt(new THREE.Vector3(0, 0.7, 0.75))
+    cam.updateProjectionMatrix()
+  }, [camera, size])
   return null
 }
 
@@ -21,10 +28,11 @@ function SceneContent() {
   return (
     <>
       <CameraSetup />
-      <ambientLight intensity={0.28} color="#cdc2b8" />
+      <ambientLight intensity={0.55} color="#cdc2b8" />
+      <hemisphereLight args={['#9090b8', '#3a2a1a', 0.5]} />
       <directionalLight
         position={[2, 4, -2]}
-        intensity={0.85}
+        intensity={1.3}
         color="#ffe9d2"
         castShadow
         shadow-mapSize-width={1024}
@@ -45,7 +53,7 @@ export function DrumKitScene() {
       gl={{
         antialias: true,
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.18,
+        toneMappingExposure: 1.3,
       }}
       style={{
         position: 'absolute',

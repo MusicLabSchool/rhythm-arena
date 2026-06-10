@@ -20,7 +20,7 @@ export function StudioEnvironment() {
       {/* Floor — warm wood */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#2b1a0e" roughness={0.75} metalness={0.05} />
+        <meshStandardMaterial color="#4a2f1a" roughness={0.7} metalness={0.05} />
       </mesh>
 
       {/* Rug under the kit */}
@@ -32,17 +32,17 @@ export function StudioEnvironment() {
       {/* Back wall — rotated to face the camera */}
       <mesh position={[0, 2.5, 3.5]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#16101e" roughness={1} />
+        <meshStandardMaterial color="#2a2138" roughness={1} />
       </mesh>
 
       {/* Side walls */}
       <mesh position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#130e1a" roughness={1} />
+        <meshStandardMaterial color="#241c30" roughness={1} />
       </mesh>
       <mesh position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#130e1a" roughness={1} />
+        <meshStandardMaterial color="#241c30" roughness={1} />
       </mesh>
 
       {/* Ceiling */}
@@ -84,11 +84,11 @@ export function StudioEnvironment() {
       <primitive object={spotTarget} />
       <spotLight
         position={[-1.8, 3.6, -1.2]}
-        angle={0.55}
-        penumbra={0.7}
-        intensity={18}
+        angle={0.7}
+        penumbra={0.8}
+        intensity={50}
         color="#ffc890"
-        distance={10}
+        distance={12}
         decay={2}
         target={spotTarget}
         castShadow
@@ -97,11 +97,11 @@ export function StudioEnvironment() {
       />
       <spotLight
         position={[1.8, 3.6, -1.0]}
-        angle={0.55}
-        penumbra={0.7}
-        intensity={12}
+        angle={0.7}
+        penumbra={0.8}
+        intensity={35}
         color="#ff9a5a"
-        distance={10}
+        distance={12}
         decay={2}
         target={spotTarget}
       />
@@ -111,7 +111,7 @@ export function StudioEnvironment() {
       <FloorLamp position={[3.2, 0, 1.6]} />
 
       {/* Cool rim fill from behind the kit */}
-      <pointLight position={[0, 2.2, 3.0]} intensity={3} color="#3a4a8c" distance={7} decay={2} />
+      <pointLight position={[0, 2.2, 3.0]} intensity={6} color="#4a5aa0" distance={8} decay={2} />
     </group>
   )
 }
@@ -170,7 +170,7 @@ function FloorLamp({ position }: { position: [number, number, number] }) {
         <sphereGeometry args={[0.12, 14, 10]} />
         <meshBasicMaterial color="#ffd9a0" />
       </mesh>
-      <pointLight position={[0, 1.85, 0]} intensity={5} color="#ffb070" distance={6} decay={2} />
+      <pointLight position={[0, 1.85, 0]} intensity={10} color="#ffb070" distance={7} decay={2} />
     </group>
   )
 }

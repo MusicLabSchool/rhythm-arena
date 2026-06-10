@@ -25,7 +25,7 @@ export const DRUM_POSITIONS = {
 } as const
 
 const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08 } as const
-const SHELL  = { color: '#5a1c12', metalness: 0.3, roughness: 0.28 } as const // mahogany lacquer
+const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35 } as const // mahogany lacquer
 const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25 } as const
 const HEAD   = { color: '#e8e2d2', roughness: 0.85, metalness: 0.0 } as const
 const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25 } as const
@@ -302,16 +302,6 @@ export function DrumKit() {
         </mesh>
       </group>
 
-      {/* === DRUM THRONE === */}
-      <mesh position={[0, 0.62, -0.52]}>
-        <cylinderGeometry args={[0.2, 0.16, 0.06, 12]} />
-        <meshStandardMaterial color="#1a1a1a" roughness={0.85} />
-      </mesh>
-      <mesh position={[0, 0.3, -0.52]}>
-        <cylinderGeometry args={[0.025, 0.025, 0.62, 8]} />
-        <meshStandardMaterial {...CHROME} />
-      </mesh>
-
       {/* === HANDS & STICKS — posed every frame in useFrame === */}
       <Hand groupRef={leftHandRef} />
       <Hand groupRef={rightHandRef} />
@@ -407,10 +397,10 @@ function Cymbal({
 function Hand({ groupRef }: { groupRef: React.Ref<THREE.Group> }) {
   return (
     <group ref={groupRef}>
-      {/* Hand/wrist */}
-      <mesh position={[0, -0.04, 0]} castShadow>
-        <boxGeometry args={[0.06, 0.09, 0.12]} />
-        <meshStandardMaterial color="#c8956a" roughness={0.8} />
+      {/* Hand/wrist — rounded fist gripping the stick */}
+      <mesh position={[0, -0.035, 0]} scale={[1, 1.4, 1.15]} castShadow>
+        <sphereGeometry args={[0.032, 12, 10]} />
+        <meshStandardMaterial color="#b5825a" roughness={0.85} />
       </mesh>
       {/* Stick — light hickory */}
       <mesh position={[0, 0.18, 0]} castShadow>
