@@ -20,7 +20,9 @@ function laneXAtZ(lane: number, z: number): number {
   const totalWidthAtZ = LANE_WIDTH_FAR + (LANE_WIDTH_NEAR - LANE_WIDTH_FAR) * t
   const laneStep = totalWidthAtZ / LANE_COUNT
   const centerOffset = (LANE_COUNT - 1) / 2
-  return (lane - centerOffset) * laneStep
+  // Negated: the camera looks down +Z, so screen-left is world +X.
+  // Lane 0 (hi-hat) must appear on the left, matching the kit and touch pads.
+  return -(lane - centerOffset) * laneStep
 }
 
 function noteWidthAtZ(z: number): number {

@@ -89,6 +89,52 @@ export function GameHUD() {
   const isMetronomeOn = useGameStore((s) => s.isMetronomeOn)
   const toggleMetronome = useGameStore((s) => s.toggleMetronome)
   const speedMultiplier = useGameStore((s) => s.speedMultiplier)
+  const isMobile = useGameStore((s) => s.isMobile)
+
+  // Mobile: one slim strip at the very top — the big side cards would
+  // cover the note highway on a portrait screen.
+  if (isMobile) {
+    return (
+      <motion.div
+        className="absolute inset-0 pointer-events-none"
+        style={{ zIndex: 20 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      >
+        <div className="absolute top-2 left-2 right-2 pointer-events-auto">
+          <div className="bg-black/60 backdrop-blur-sm rounded-xl px-3 py-1.5 border border-white/10 flex items-center justify-between gap-2">
+            <div className="flex items-baseline gap-3 min-w-0">
+              <span className="text-white text-base font-black tabular-nums">{score.toLocaleString()}</span>
+              <span className="text-yellow-300 text-xs font-bold tabular-nums">{combo}x</span>
+              <span className="text-emerald-300 text-xs font-bold tabular-nums">{accuracy}%</span>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-white/50 text-[10px] font-semibold tabular-nums">{bpm} BPM</span>
+              <button
+                className={`text-[10px] px-1.5 py-0.5 rounded border ${
+                  isMetronomeOn ? 'border-purple-400/60 text-purple-300' : 'border-white/20 text-white/30'
+                }`}
+                onClick={toggleMetronome}
+              >
+                Click
+              </button>
+              <button
+                className="text-[10px] px-2 py-0.5 rounded border border-white/20 text-white/50"
+                onClick={() => { gameRuntime.pause(); setPhase('paused') }}
+              >
+                ‖
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <CountInOverlay />
+        <RatingFeedback />
+        <ComboMilestoneBanner />
+      </motion.div>
+    )
+  }
 
   return (
     <motion.div
