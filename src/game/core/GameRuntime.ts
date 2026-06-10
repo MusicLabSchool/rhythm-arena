@@ -1,7 +1,7 @@
 import type { ActiveDrumId, HitRating, LessonDef, NoteEvent } from '@/types'
 import { audioEngine } from '@/game/audio/NativeAudioEngine'
 import { useGameStore } from '@/store/gameStore'
-import { DRUM_LIMB_MAP, getLimbActionForDrum } from '@/game/animation/LimbAnimator'
+import { DRUM_LIMB_MAP, getLimbActionForDrum, registerDrumHit } from '@/game/animation/LimbAnimator'
 import { LANE_INDICES } from '@/game/lessons/lessons'
 
 const HIT_WINDOWS: [number, HitRating][] = [
@@ -106,9 +106,8 @@ export class GameRuntime {
 
   onDrumHit(drumId: ActiveDrumId, velocity = 1): void {
     audioEngine.playDrum(drumId, velocity)
+    registerDrumHit(drumId)
     this.animateLimbs(drumId)
-    useGameStore.getState().setHighlightedDrum(drumId)
-    setTimeout(() => useGameStore.getState().setHighlightedDrum(null), 120)
 
     if (!this.running) return
 

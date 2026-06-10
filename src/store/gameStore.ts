@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import type { GamePhase, DrumId, ActiveDrumId, Limb, HitRating, LimbAction, NoteEvent, LessonDef, LessonResult, HitEffect } from '@/types'
+import type { GamePhase, ActiveDrumId, Limb, HitRating, LimbAction, NoteEvent, LessonDef, LessonResult, HitEffect } from '@/types'
 
 const DEFAULT_MIDI_MAPPING: Record<number, ActiveDrumId> = {
   36: 'kick',
@@ -99,9 +99,6 @@ interface GameState {
 
   isMetronomeOn: boolean
   toggleMetronome: () => void
-
-  highlightedDrum: DrumId | null
-  setHighlightedDrum: (d: DrumId | null) => void
 }
 
 function pointsForRating(r: HitRating) {
@@ -243,9 +240,6 @@ export const useGameStore = create<GameState>((set) => ({
 
   isMetronomeOn: true,
   toggleMetronome: () => set((s) => ({ isMetronomeOn: !s.isMetronomeOn })),
-
-  highlightedDrum: null,
-  setHighlightedDrum: (d) => set({ highlightedDrum: d }),
 
   hitEffect: null,
   triggerHitEffect: (lane, rating) => set({ hitEffect: { id: ++hitEffectId, lane, rating } }),

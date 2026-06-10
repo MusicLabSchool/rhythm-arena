@@ -12,6 +12,8 @@ export interface LimbAction {
   startTime: number
   duration: number
   peakAngle: number
+  /** Which drum this strike is aimed at — hands swing toward it. */
+  drumId?: ActiveDrumId
 }
 
 export interface NoteEvent {
