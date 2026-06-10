@@ -6,22 +6,25 @@ import { getStore } from '@/store/gameStore'
 import { makeTextTexture } from '@/game/utils/textTexture'
 import type { ActiveDrumId } from '@/types'
 
-// Exported for verification — DO NOT change these without updating both feet and pedals
+// Exported for verification — DO NOT change these without updating both feet and pedals.
+// NOTE on handedness: the camera sits at -Z looking toward +Z, so the camera's
+// screen-left is world +X. Player-left things (hi-hat, hi-hat pedal, left foot)
+// therefore live at POSITIVE x — negating these mirrors the kit into a lefty setup.
 export const DRUM_POSITIONS = {
-  kick:        new THREE.Vector3(0.18, 0.46, 0.98),
-  snare:       new THREE.Vector3(-0.25, 0.72, 0.42),
-  hihat:       new THREE.Vector3(-0.75, 1.05, 0.48),
-  crash:       new THREE.Vector3(-1.1, 1.35, 0.65),
-  ride:        new THREE.Vector3(1.18, 1.22, 0.72),
-  rackTom1:    new THREE.Vector3(-0.32, 1.15, 0.58),
-  rackTom2:    new THREE.Vector3(0.32, 1.12, 0.58),
-  floorTom:    new THREE.Vector3(0.95, 0.44, 0.72),
-  // Pedals — non-negotiable X positions
-  'hihat-pedal': new THREE.Vector3(-0.75, 0.015, 0.40),  // VIEWER LEFT
-  'kick-pedal':  new THREE.Vector3(0.18, 0.015, 0.45),   // VIEWER RIGHT
+  kick:        new THREE.Vector3(-0.18, 0.46, 0.98),
+  snare:       new THREE.Vector3(0.25, 0.72, 0.42),
+  hihat:       new THREE.Vector3(0.75, 1.05, 0.48),
+  crash:       new THREE.Vector3(1.1, 1.35, 0.65),
+  ride:        new THREE.Vector3(-1.18, 1.22, 0.72),
+  rackTom1:    new THREE.Vector3(0.32, 1.15, 0.58),
+  rackTom2:    new THREE.Vector3(-0.32, 1.12, 0.58),
+  floorTom:    new THREE.Vector3(-0.95, 0.44, 0.72),
+  // Pedals — non-negotiable: hi-hat pedal on the player's LEFT (screen left)
+  'hihat-pedal': new THREE.Vector3(0.75, 0.015, 0.40),
+  'kick-pedal':  new THREE.Vector3(-0.18, 0.015, 0.45),
   // Feet — group origin at the heel so taps pivot like a real ankle
-  leftFoot:    new THREE.Vector3(-0.75, 0.07, 0.36),     // rests on hihat pedal
-  rightFoot:   new THREE.Vector3(0.18, 0.07, 0.41),      // rests on kick pedal
+  leftFoot:    new THREE.Vector3(0.75, 0.07, 0.36),      // rests on hihat pedal
+  rightFoot:   new THREE.Vector3(-0.18, 0.07, 0.41),     // rests on kick pedal
 } as const
 
 const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08 } as const
@@ -40,15 +43,15 @@ interface HandPose {
   rot: readonly [number, number, number]
 }
 
-const LEFT_HAND_REST: HandPose = { pos: [-0.26, 0.56, -0.10], rot: [0.72, -0.10, 0.14] }
+const LEFT_HAND_REST: HandPose = { pos: [0.26, 0.56, -0.10], rot: [0.95, 0.10, -0.14] }
 const LEFT_HAND_TARGETS: Partial<Record<ActiveDrumId, HandPose>> = {
-  snare: { pos: [-0.26, 0.50, 0.02], rot: [0.95, -0.06, 0.10] },
+  snare: { pos: [0.26, 0.50, 0.02], rot: [1.15, 0.06, -0.10] },
 }
 
-const RIGHT_HAND_REST: HandPose = { pos: [-0.36, 0.70, -0.06], rot: [0.62, 0.12, 0.42] }
+const RIGHT_HAND_REST: HandPose = { pos: [0.36, 0.70, -0.06], rot: [0.85, -0.12, -0.42] }
 const RIGHT_HAND_TARGETS: Partial<Record<ActiveDrumId, HandPose>> = {
-  hihat: { pos: [-0.50, 0.76, 0.16], rot: [0.98, 0.18, 0.55] },
-  crash: { pos: [-0.68, 0.95, 0.24], rot: [0.82, 0.24, 0.85] },
+  hihat: { pos: [0.50, 0.76, 0.16], rot: [1.1, -0.18, -0.55] },
+  crash: { pos: [0.68, 0.95, 0.24], rot: [0.95, -0.24, -0.85] },
 }
 
 function applyHandPose(g: THREE.Group | null, rest: HandPose, target: HandPose, s: number): void {
@@ -126,7 +129,7 @@ export function DrumKit() {
     if (crashRef.current) {
       const w = cymbalWobble('crash', now, 0.22)
       crashRef.current.rotation.x = 0.18 + w.x
-      crashRef.current.rotation.z = -0.15 + w.z
+      crashRef.current.rotation.z = 0.15 + w.z
     }
     if (hihatTopRef.current) {
       const w = cymbalWobble('hihat', now, 0.07)
@@ -260,28 +263,28 @@ export function DrumKit() {
       </group>
 
       {/* === CRASH — wobbles when struck === */}
-      <group position={DRUM_POSITIONS.crash.toArray()} ref={crashRef} rotation={[0.18, 0, -0.15]}>
+      <group position={DRUM_POSITIONS.crash.toArray()} ref={crashRef} rotation={[0.18, 0, 0.15]}>
         <Cymbal radius={0.28} matRef={crashMat} emissive="#ffaa33" />
       </group>
-      <mesh position={[-1.08, 0.67, 0.63]}>
+      <mesh position={[1.08, 0.67, 0.63]}>
         <cylinderGeometry args={[0.009, 0.012, 1.34, 8]} />
         <meshStandardMaterial {...CHROME} />
       </mesh>
 
       {/* === RIDE === */}
-      <group position={DRUM_POSITIONS.ride.toArray()} rotation={[0.15, 0, 0.12]}>
+      <group position={DRUM_POSITIONS.ride.toArray()} rotation={[0.15, 0, -0.12]}>
         <Cymbal radius={0.32} />
       </group>
-      <mesh position={[1.16, 0.61, 0.7]}>
+      <mesh position={[-1.16, 0.61, 0.7]}>
         <cylinderGeometry args={[0.009, 0.012, 1.22, 8]} />
         <meshStandardMaterial {...CHROME} />
       </mesh>
 
       {/* === RACK TOMS — tilted toward the player === */}
-      <group position={DRUM_POSITIONS.rackTom1.toArray()} rotation={[-0.28, 0, 0.08]}>
+      <group position={DRUM_POSITIONS.rackTom1.toArray()} rotation={[-0.28, 0, -0.08]}>
         <ShellDrum radius={0.155} depth={0.16} />
       </group>
-      <group position={DRUM_POSITIONS.rackTom2.toArray()} rotation={[-0.28, 0, -0.08]}>
+      <group position={DRUM_POSITIONS.rackTom2.toArray()} rotation={[-0.28, 0, 0.08]}>
         <ShellDrum radius={0.17} depth={0.16} />
       </group>
 
@@ -306,11 +309,11 @@ export function DrumKit() {
       <Hand groupRef={leftHandRef} />
       <Hand groupRef={rightHandRef} />
 
-      {/* === LEFT FOOT — hi-hat pedal (VIEWER LEFT), heel pivot === */}
-      <Foot groupRef={leftFootRef} position={DRUM_POSITIONS.leftFoot.toArray()} rotationY={-0.21} />
+      {/* === LEFT FOOT — hi-hat pedal (player's LEFT), heel pivot === */}
+      <Foot groupRef={leftFootRef} position={DRUM_POSITIONS.leftFoot.toArray()} rotationY={0.21} />
 
-      {/* === RIGHT FOOT — kick pedal (VIEWER RIGHT), heel pivot === */}
-      <Foot groupRef={rightFootRef} position={DRUM_POSITIONS.rightFoot.toArray()} rotationY={0.07} />
+      {/* === RIGHT FOOT — kick pedal (player's RIGHT), heel pivot === */}
+      <Foot groupRef={rightFootRef} position={DRUM_POSITIONS.rightFoot.toArray()} rotationY={-0.07} />
     </group>
   )
 }
