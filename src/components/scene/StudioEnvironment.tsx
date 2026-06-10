@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import * as THREE from 'three'
 import { makeTextTexture } from '@/game/utils/textTexture'
+import { makeWoodFloorTexture } from '@/game/utils/woodTexture'
 
 const STAGE_LIGHT_COLORS = ['#a855f7', '#f59e0b', '#38bdf8', '#f43f5e', '#a855f7', '#f59e0b', '#38bdf8']
 
@@ -9,6 +10,7 @@ export function StudioEnvironment() {
     () => makeTextTexture('MUSIC LAB', { fill: '#efe0ff', glow: '#a855f7' }),
     [],
   )
+  const woodFloor = useMemo(() => makeWoodFloorTexture('#4a2f1a'), [])
   const spotTarget = useMemo(() => {
     const o = new THREE.Object3D()
     o.position.set(0, 0.7, 0.6)
@@ -17,10 +19,10 @@ export function StudioEnvironment() {
 
   return (
     <group>
-      {/* Floor — warm wood with a faint lacquered sheen */}
+      {/* Floor — warm wood planks */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#4a2f1a" roughness={0.45} metalness={0.08} envMapIntensity={0.3} />
+        <meshStandardMaterial map={woodFloor} roughness={0.65} metalness={0.05} />
       </mesh>
 
       {/* Rug under the kit */}
