@@ -21,10 +21,11 @@ function SceneContent() {
   return (
     <>
       <CameraSetup />
-      <ambientLight intensity={0.3} />
+      <ambientLight intensity={0.28} color="#cdc2b8" />
       <directionalLight
-        position={[2, 4, -1]}
-        intensity={1.0}
+        position={[2, 4, -2]}
+        intensity={0.85}
+        color="#ffe9d2"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -44,7 +45,7 @@ export function DrumKitScene() {
       gl={{
         antialias: true,
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.1,
+        toneMappingExposure: 1.18,
       }}
       style={{
         position: 'absolute',
