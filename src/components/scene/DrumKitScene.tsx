@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
+import { Environment, ContactShadows } from '@react-three/drei'
 import * as THREE from 'three'
 import { DrumKit } from './DrumKit'
 import { StudioEnvironment } from './StudioEnvironment'
@@ -40,6 +41,11 @@ function SceneContent() {
       />
       <StudioEnvironment />
       <DrumKit />
+      {/* Subtle studio reflections on chrome/cymbals/lacquer — keeps the moody
+          stage lighting but gives metal and gloss surfaces real highlights. */}
+      <Environment preset="studio" background={false} />
+      {/* Soft contact shadow grounds the kit on the rug. */}
+      <ContactShadows position={[0, 0.006, 0.6]} opacity={0.45} scale={6} blur={2.4} far={2} color="#000000" />
       {(phase === 'playing' || phase === 'paused') && <RhythmHighway />}
     </>
   )

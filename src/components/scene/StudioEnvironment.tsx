@@ -17,10 +17,10 @@ export function StudioEnvironment() {
 
   return (
     <group>
-      {/* Floor — warm wood */}
+      {/* Floor — warm wood with a faint lacquered sheen */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#4a2f1a" roughness={0.7} metalness={0.05} />
+        <meshStandardMaterial color="#4a2f1a" roughness={0.45} metalness={0.08} envMapIntensity={0.3} />
       </mesh>
 
       {/* Rug under the kit */}
