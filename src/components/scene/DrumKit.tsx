@@ -27,11 +27,11 @@ export const DRUM_POSITIONS = {
   rightFoot:   new THREE.Vector3(-0.18, 0.07, 0.41),     // rests on kick pedal
 } as const
 
-const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08, envMapIntensity: 0.6 } as const
-const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35, envMapIntensity: 0.25 } as const // mahogany lacquer
-const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25, envMapIntensity: 0.45 } as const
+const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08 } as const
+const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35 } as const // mahogany lacquer
+const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25 } as const
 const HEAD   = { color: '#e8e2d2', roughness: 0.85, metalness: 0.0 } as const
-const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25, envMapIntensity: 0.5 } as const
+const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25 } as const
 const STICK  = { color: '#caa46a', roughness: 0.6, metalness: 0.0 } as const
 
 // ── Hand pose system ────────────────────────────────────────────────
