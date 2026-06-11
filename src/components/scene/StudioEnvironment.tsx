@@ -3,14 +3,16 @@ import * as THREE from 'three'
 import { makeTextTexture } from '@/game/utils/textTexture'
 import { makeWoodFloorTexture } from '@/game/utils/woodTexture'
 
-const STAGE_LIGHT_COLORS = ['#a855f7', '#f59e0b', '#38bdf8', '#f43f5e', '#a855f7', '#f59e0b', '#38bdf8']
+// Warm practical lamps along the back wall — amber tones, like studio wall sconces.
+const STAGE_LIGHT_COLORS = ['#ffb45a', '#ffd9a0', '#ff9a4a', '#ffc878', '#ffb45a', '#ffd9a0', '#ff9a4a']
 
 export function StudioEnvironment() {
   const sign = useMemo(
     () => makeTextTexture('MUSIC LAB', { fill: '#efe0ff', glow: '#a855f7' }),
     [],
   )
-  const woodFloor = useMemo(() => makeWoodFloorTexture('#4a2f1a'), [])
+  const woodFloor = useMemo(() => makeWoodFloorTexture('#33200f'), [])
+  const woodWall = useMemo(() => makeWoodFloorTexture('#1d1209'), [])
   const spotTarget = useMemo(() => {
     const o = new THREE.Object3D()
     o.position.set(0, 0.7, 0.6)
@@ -31,26 +33,26 @@ export function StudioEnvironment() {
         <meshStandardMaterial color="#171210" roughness={0.95} />
       </mesh>
 
-      {/* Back wall — rotated to face the camera */}
+      {/* Back wall — dark wood panelling, rotated to face the camera */}
       <mesh position={[0, 2.5, 3.5]} rotation={[0, Math.PI, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#2a2138" roughness={1} />
+        <meshStandardMaterial map={woodWall} color="#564434" roughness={0.9} />
       </mesh>
 
       {/* Side walls */}
       <mesh position={[-5, 2.5, 0]} rotation={[0, Math.PI / 2, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#241c30" roughness={1} />
+        <meshStandardMaterial map={woodWall} color="#48382a" roughness={0.95} />
       </mesh>
       <mesh position={[5, 2.5, 0]} rotation={[0, -Math.PI / 2, 0]}>
         <planeGeometry args={[14, 5]} />
-        <meshStandardMaterial color="#241c30" roughness={1} />
+        <meshStandardMaterial map={woodWall} color="#48382a" roughness={0.95} />
       </mesh>
 
       {/* Ceiling */}
       <mesh position={[0, 4.5, 0]} rotation={[Math.PI / 2, 0, 0]}>
         <planeGeometry args={[14, 14]} />
-        <meshStandardMaterial color="#080810" roughness={1} />
+        <meshStandardMaterial color="#050508" roughness={1} />
       </mesh>
 
       {/* Neon MUSIC LAB sign */}
@@ -58,7 +60,7 @@ export function StudioEnvironment() {
         <planeGeometry args={[2.2, 0.55]} />
         <meshBasicMaterial map={sign} transparent />
       </mesh>
-      <pointLight position={[0, 3.0, 3.2]} intensity={2.5} color="#a855f7" distance={4} decay={2} />
+      <pointLight position={[0, 3.0, 3.2]} intensity={1.0} color="#a855f7" distance={3} decay={2} />
 
       {/* Stage bokeh lights along the back wall */}
       {STAGE_LIGHT_COLORS.map((color, i) => (
@@ -86,9 +88,9 @@ export function StudioEnvironment() {
       <primitive object={spotTarget} />
       <spotLight
         position={[-1.8, 3.6, -1.2]}
-        angle={0.7}
-        penumbra={0.8}
-        intensity={50}
+        angle={0.52}
+        penumbra={0.85}
+        intensity={34}
         color="#ffc890"
         distance={12}
         decay={2}
@@ -99,9 +101,9 @@ export function StudioEnvironment() {
       />
       <spotLight
         position={[1.8, 3.6, -1.0]}
-        angle={0.7}
-        penumbra={0.8}
-        intensity={35}
+        angle={0.52}
+        penumbra={0.85}
+        intensity={24}
         color="#ff9a5a"
         distance={12}
         decay={2}
@@ -112,8 +114,8 @@ export function StudioEnvironment() {
       <FloorLamp position={[-3.2, 0, 1.6]} />
       <FloorLamp position={[3.2, 0, 1.6]} />
 
-      {/* Cool rim fill from behind the kit */}
-      <pointLight position={[0, 2.2, 3.0]} intensity={6} color="#4a5aa0" distance={8} decay={2} />
+      {/* Subtle cool rim fill from behind the kit */}
+      <pointLight position={[0, 2.2, 3.0]} intensity={2.5} color="#3a4a80" distance={7} decay={2} />
     </group>
   )
 }

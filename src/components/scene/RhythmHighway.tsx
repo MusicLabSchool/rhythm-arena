@@ -7,11 +7,16 @@ import type { HitRating } from '@/types'
 // Lane colours: [hihat, snare, kick, crash]
 const LANE_COLORS = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b'] as const
 
-const HIT_Z = -0.25
-const FAR_Z = -1.7
-const HIGHWAY_Y = 1.15
-const LANE_WIDTH_NEAR = 1.8
-const LANE_WIDTH_FAR = 0.12
+// Notes spawn at FAR_Z (high above the kit) and slide down the tilted panel
+// toward the hit line at HIT_Z (closer to the camera, just above the drums).
+const HIT_Z = -1.45
+const FAR_Z = 0.4
+const HIGHWAY_Y = 0.95
+// The whole highway tilts about the hit line so the panel faces the camera
+// like a ramp instead of being viewed edge-on.
+const HIGHWAY_TILT = -0.35
+const LANE_WIDTH_NEAR = 0.85
+const LANE_WIDTH_FAR = 0.45
 const LANE_COUNT = 4
 const NOTE_TRAVEL_MS = 2200
 
@@ -67,8 +72,49 @@ export function RhythmHighway() {
     })
   }, [])
 
+  // Full-width backing panel + bright outer edge rails
+  const backingShape = useMemo(() => {
+    const margin = 1.12
+    const halfNear = (LANE_WIDTH_NEAR / 2) * margin
+    const halfFar = (LANE_WIDTH_FAR / 2) * margin
+    const shape = new THREE.Shape()
+    shape.moveTo(-halfFar, FAR_Z)
+    shape.lineTo(halfFar, FAR_Z)
+    shape.lineTo(halfNear, HIT_Z)
+    shape.lineTo(-halfNear, HIT_Z)
+    shape.closePath()
+    return shape
+  }, [])
+
+  const edgeRailGeos = useMemo(() => {
+    return [-0.5, LANE_COUNT - 0.5].map((lane) => {
+      const pts = [
+        new THREE.Vector3(laneXAtZ(lane, FAR_Z), HIGHWAY_Y + 0.012, FAR_Z),
+        new THREE.Vector3(laneXAtZ(lane, HIT_Z), HIGHWAY_Y + 0.012, HIT_Z),
+      ]
+      return new THREE.BufferGeometry().setFromPoints(pts)
+    })
+  }, [])
+
   return (
-    <group ref={groupRef}>
+    // Pivot at the hit line: the panel rotates toward the camera there, so the
+    // hit line stays put while the spawn end dips down to face the player.
+    <group ref={groupRef} position={[0, HIGHWAY_Y, HIT_Z]} rotation={[HIGHWAY_TILT, 0, 0]}>
+    <group position={[0, -HIGHWAY_Y, -HIT_Z]}>
+      {/* Dark translucent backing — makes the highway read as a floating panel.
+          NOTE: +PI/2 keeps shape-space y == world z; -PI/2 mirrors the panel. */}
+      <mesh position={[0, HIGHWAY_Y - 0.01, 0]} rotation={[Math.PI / 2, 0, 0]} renderOrder={0}>
+        <primitive object={new THREE.ShapeGeometry(backingShape)} />
+        <meshBasicMaterial color="#05050a" transparent opacity={0.45} depthWrite={false} side={THREE.DoubleSide} />
+      </mesh>
+
+      {/* Bright outer edge rails */}
+      {edgeRailGeos.map((geo, i) => {
+        const railMat = new THREE.LineBasicMaterial({ color: '#aab8d8', transparent: true, opacity: 0.7 })
+        const railObj = new THREE.Line(geo, railMat)
+        return <primitive key={`rail-${i}`} object={railObj} renderOrder={2} />
+      })}
+
       {/* Lane backgrounds */}
       {laneBackgrounds.map(({ shape, color }, i) => {
         const geo = new THREE.ShapeGeometry(shape)
@@ -76,14 +122,14 @@ export function RhythmHighway() {
           <mesh
             key={i}
             position={[0, HIGHWAY_Y - 0.005, 0]}
-            rotation={[-Math.PI / 2, 0, 0]}
+            rotation={[Math.PI / 2, 0, 0]}
             renderOrder={1}
           >
             <primitive object={geo} />
             <meshBasicMaterial
               color={color}
               transparent
-              opacity={0.09}
+              opacity={0.015}
               depthWrite={false}
               side={THREE.DoubleSide}
             />
@@ -93,7 +139,7 @@ export function RhythmHighway() {
 
       {/* Lane dividers */}
       {dividerGeos.map((geo, i) => {
-        const lineMat = new THREE.LineBasicMaterial({ color: '#334455', transparent: true, opacity: 0.4 })
+        const lineMat = new THREE.LineBasicMaterial({ color: '#56688a', transparent: true, opacity: 0.55 })
         const lineObj = new THREE.Line(geo, lineMat)
         return <primitive key={i} object={lineObj} renderOrder={2} />
       })}
@@ -103,6 +149,20 @@ export function RhythmHighway() {
         <planeGeometry args={[LANE_WIDTH_NEAR + 0.12, 0.025]} />
         <meshBasicMaterial color="#ffffff" transparent opacity={0.85} depthWrite={false} />
       </mesh>
+
+      {/* Colored receptor pads at the hit line, one per lane — like the
+          button row in classic rhythm games. */}
+      {LANE_COLORS.map((color, i) => (
+        <mesh
+          key={`receptor-${i}`}
+          position={[laneXAtZ(i, HIT_Z), HIGHWAY_Y + 0.014, HIT_Z + 0.06]}
+          rotation={[-Math.PI / 2, 0, 0]}
+          renderOrder={4}
+        >
+          <planeGeometry args={[(LANE_WIDTH_NEAR / LANE_COUNT) * 0.74, 0.085]} />
+          <meshBasicMaterial color={color} transparent opacity={0.55} depthWrite={false} />
+        </mesh>
+      ))}
 
       {/* Hit line glow */}
       <mesh position={[0, HIGHWAY_Y + 0.012, HIT_Z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={3}>
@@ -115,6 +175,7 @@ export function RhythmHighway() {
 
       {/* Hit-line impact effects */}
       <HitBurst />
+    </group>
     </group>
   )
 }

@@ -16,9 +16,9 @@ function CameraSetup() {
     const aspect = size.width / size.height
     const portrait = aspect < 0.9
     const cam = camera as THREE.PerspectiveCamera
-    cam.fov = portrait ? 80 : 65
-    cam.position.set(0, portrait ? 1.4 : 1.25, portrait ? -3.1 : -2.4)
-    cam.lookAt(new THREE.Vector3(0, 0.7, 0.75))
+    cam.fov = portrait ? 74 : 60
+    cam.position.set(0, portrait ? 1.32 : 1.2, portrait ? -2.6 : -2.05)
+    cam.lookAt(new THREE.Vector3(0, 0.72, 0.75))
     cam.updateProjectionMatrix()
   }, [camera, size])
   return null
@@ -30,12 +30,13 @@ function SceneContent() {
   return (
     <>
       <CameraSetup />
-      <ambientLight intensity={0.55} color="#cdc2b8" />
-      <hemisphereLight args={['#9090b8', '#3a2a1a', 0.5]} />
+      {/* Near-dark base — the kit is carved out of darkness by the warm spots. */}
+      <ambientLight intensity={0.12} color="#5a5468" />
+      <hemisphereLight args={['#3a3450', '#1a120a', 0.25]} />
       <directionalLight
         position={[2, 4, -2]}
-        intensity={1.3}
-        color="#ffe9d2"
+        intensity={0.7}
+        color="#ffdcb4"
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -48,12 +49,12 @@ function SceneContent() {
       {/* Gentle glow on the neon sign / hot spotlights + filmic edge darkening */}
       <EffectComposer multisampling={0}>
         <Bloom
-          intensity={0.35}
-          luminanceThreshold={0.85}
-          luminanceSmoothing={0.3}
+          intensity={0.55}
+          luminanceThreshold={0.7}
+          luminanceSmoothing={0.35}
           mipmapBlur
         />
-        <Vignette eskil={false} offset={0.15} darkness={0.6} />
+        <Vignette eskil={false} offset={0.2} darkness={0.75} />
       </EffectComposer>
     </>
   )
@@ -67,7 +68,7 @@ export function DrumKitScene() {
       gl={{
         antialias: true,
         toneMapping: THREE.ACESFilmicToneMapping,
-        toneMappingExposure: 1.3,
+        toneMappingExposure: 1.15,
       }}
       style={{
         position: 'absolute',

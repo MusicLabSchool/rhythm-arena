@@ -29,11 +29,11 @@ export const DRUM_POSITIONS = {
 } as const
 
 const CHROME = { color: '#b8bcc4', metalness: 0.95, roughness: 0.08 } as const
-const SHELL  = { color: '#8a3420', metalness: 0.25, roughness: 0.35 } as const // mahogany lacquer
+const SHELL  = { color: '#4a2014', metalness: 0.2, roughness: 0.3 } as const // dark walnut lacquer
 const STEEL_SHELL = { color: '#c8ccd4', metalness: 0.85, roughness: 0.25 } as const
-const HEAD   = { color: '#e8e2d2', roughness: 0.85, metalness: 0.0 } as const
-const CYMBAL = { color: '#c9952c', metalness: 0.9, roughness: 0.25 } as const
-const STICK  = { color: '#caa46a', roughness: 0.6, metalness: 0.0 } as const
+const HEAD   = { color: '#b8b0a0', roughness: 0.9, metalness: 0.0 } as const
+const CYMBAL = { color: '#d9a838', metalness: 0.95, roughness: 0.18 } as const
+const STICK  = { color: '#dcb47e', roughness: 0.5, metalness: 0.0 } as const
 
 // ── Hand pose system ────────────────────────────────────────────────
 // Each hand rests near its home drum and swings toward the drum being
@@ -44,15 +44,18 @@ interface HandPose {
   rot: readonly [number, number, number]
 }
 
-const LEFT_HAND_REST: HandPose = { pos: [0.26, 0.56, -0.10], rot: [0.95, 0.10, -0.14] }
+// POV sticks: rest near the camera at the bottom corners of the frame
+// (player's left hand = screen-left = world +X) and flick forward toward
+// the target drum on a strike, like a first-person drummer.
+const LEFT_HAND_REST: HandPose = { pos: [0.36, 0.62, -1.45], rot: [1.18, 0, 0.28] }
 const LEFT_HAND_TARGETS: Partial<Record<ActiveDrumId, HandPose>> = {
-  snare: { pos: [0.26, 0.50, 0.02], rot: [1.15, 0.06, -0.10] },
+  snare: { pos: [0.34, 0.56, -1.34], rot: [1.5, 0, 0.3] },
 }
 
-const RIGHT_HAND_REST: HandPose = { pos: [0.36, 0.70, -0.06], rot: [0.85, -0.12, -0.42] }
+const RIGHT_HAND_REST: HandPose = { pos: [-0.36, 0.62, -1.45], rot: [1.18, 0, -0.28] }
 const RIGHT_HAND_TARGETS: Partial<Record<ActiveDrumId, HandPose>> = {
-  hihat: { pos: [0.50, 0.76, 0.16], rot: [1.1, -0.18, -0.55] },
-  crash: { pos: [0.68, 0.95, 0.24], rot: [0.95, -0.24, -0.85] },
+  hihat: { pos: [-0.3, 0.58, -1.34], rot: [1.45, 0, -0.55] },
+  crash: { pos: [-0.26, 0.64, -1.3], rot: [1.35, 0, -0.7] },
 }
 
 function applyHandPose(g: THREE.Group | null, rest: HandPose, target: HandPose, s: number): void {
@@ -444,19 +447,14 @@ function Cymbal({
 function Hand({ groupRef }: { groupRef: React.Ref<THREE.Group> }) {
   return (
     <group ref={groupRef}>
-      {/* Hand/wrist — rounded fist gripping the stick */}
-      <mesh position={[0, -0.035, 0]} scale={[1, 1.4, 1.15]} castShadow>
-        <sphereGeometry args={[0.032, 12, 10]} />
-        <meshStandardMaterial color="#b5825a" roughness={0.85} />
-      </mesh>
-      {/* Stick — light hickory */}
-      <mesh position={[0, 0.18, 0]} castShadow>
-        <cylinderGeometry args={[0.0075, 0.0058, 0.4, 8]} />
+      {/* Stick — light hickory, slightly oversized so the POV grip reads clearly */}
+      <mesh position={[0, 0.2, 0]} castShadow>
+        <cylinderGeometry args={[0.0095, 0.0072, 0.44, 8]} />
         <meshStandardMaterial {...STICK} />
       </mesh>
       {/* Tip */}
-      <mesh position={[0, 0.385, 0]}>
-        <sphereGeometry args={[0.011, 8, 6]} />
+      <mesh position={[0, 0.425, 0]}>
+        <sphereGeometry args={[0.013, 8, 6]} />
         <meshStandardMaterial color="#e8d0a0" roughness={0.6} />
       </mesh>
     </group>
