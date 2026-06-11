@@ -1,6 +1,6 @@
-import { useEffect } from 'react'
+import { Suspense, useEffect } from 'react'
 import { Canvas, useThree } from '@react-three/fiber'
-import { ContactShadows } from '@react-three/drei'
+import { ContactShadows, Environment } from '@react-three/drei'
 import { EffectComposer, Bloom, Vignette } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { DrumKit } from './DrumKit'
@@ -24,6 +24,22 @@ function CameraSetup() {
   return null
 }
 
+/**
+ * Keeps the HDRI's contribution low so it adds realistic reflections to
+ * chrome/cymbals WITHOUT washing out the dark stage-lit mood (setting the
+ * environment at full strength relights every PBR material in the scene).
+ */
+function EnvironmentIntensity({ value }: { value: number }) {
+  const scene = useThree((s) => s.scene)
+  useEffect(() => {
+    scene.environmentIntensity = value
+    return () => {
+      scene.environmentIntensity = 1
+    }
+  }, [scene, value])
+  return null
+}
+
 function SceneContent() {
   const phase = useGameStore((s) => s.phase)
 
@@ -41,6 +57,12 @@ function SceneContent() {
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
+      {/* HDRI image-based lighting (Poly Haven "Country Club", CC0) —
+          gives chrome, cymbals and lacquer real-world reflections. */}
+      <Suspense fallback={null}>
+        <Environment files="/hdri/studio_1k.hdr" />
+      </Suspense>
+      <EnvironmentIntensity value={0.3} />
       <StudioEnvironment />
       <DrumKit />
       {/* Soft contact shadow grounds the kit on the rug. */}

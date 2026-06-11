@@ -19,7 +19,7 @@ await page.goto(url, { waitUntil: 'networkidle' })
 await page.waitForTimeout(1500)
 for (const sel of clicks) {
   try {
-    await page.click(sel, { timeout: 4000 })
+    await page.click(sel, { timeout: 15000 })
     await page.waitForTimeout(800)
   } catch (e) {
     console.log('CLICK FAILED:', sel, e.message.split('\n')[0])
