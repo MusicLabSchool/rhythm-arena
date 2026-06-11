@@ -4,6 +4,7 @@ import * as THREE from 'three'
 import { strikeProgress, cymbalWobble, drumHitTimes } from '@/game/animation/LimbAnimator'
 import { getStore } from '@/store/gameStore'
 import { makeTextTexture } from '@/game/utils/textTexture'
+import { makeWoodShellTexture, makeBrushedMetalTexture, makeCymbalTexture } from '@/game/utils/materialTextures'
 import type { ActiveDrumId } from '@/types'
 
 // Exported for verification — DO NOT change these without updating both feet and pedals.
@@ -94,6 +95,11 @@ export function DrumKit() {
     [],
   )
 
+  // Procedural shell/cymbal finishes — wood grain, brushed steel, lathe rings.
+  const woodShellTex = useMemo(() => makeWoodShellTexture(SHELL.color), [])
+  const brushedSteelTex = useMemo(() => makeBrushedMetalTexture(STEEL_SHELL.color), [])
+  const cymbalTex = useMemo(() => makeCymbalTexture(CYMBAL.color), [])
+
   useFrame(() => {
     const now = performance.now()
     const { activeLimbActions } = getStore()
@@ -161,6 +167,8 @@ export function DrumKit() {
           <meshPhysicalMaterial
             ref={kickMat}
             {...SHELL}
+            map={woodShellTex}
+            color="#ffffff"
             clearcoat={0.6}
             clearcoatRoughness={0.2}
             emissive="#ff5533"
@@ -231,6 +239,7 @@ export function DrumKit() {
           radius={0.185}
           depth={0.12}
           shell={STEEL_SHELL}
+          map={brushedSteelTex}
           emissive="#4488ff"
           matRef={snareMat}
           lugs={8}
@@ -265,12 +274,12 @@ export function DrumKit() {
       <group position={DRUM_POSITIONS.hihat.toArray()}>
         {/* Top cymbal — wobbles and "chicks" down with the pedal */}
         <group ref={hihatTopRef} position={[0, 0.018, 0]}>
-          <Cymbal radius={0.22} matRef={hihatMat} emissive="#33ffaa" />
+          <Cymbal radius={0.22} matRef={hihatMat} emissive="#33ffaa" map={cymbalTex} />
         </group>
         {/* Bottom cymbal — inverted, static */}
         <mesh position={[0, -0.018, 0]} rotation={[Math.PI, 0, 0]}>
           <coneGeometry args={[0.22, 0.028, 40, 1, true]} />
-          <meshStandardMaterial {...CYMBAL} side={THREE.DoubleSide} />
+          <meshStandardMaterial {...CYMBAL} map={cymbalTex} color="#ffffff" side={THREE.DoubleSide} />
         </mesh>
         <mesh>
           <cylinderGeometry args={[0.008, 0.008, 0.14, 8]} />
@@ -280,7 +289,7 @@ export function DrumKit() {
 
       {/* === CRASH — wobbles when struck === */}
       <group position={DRUM_POSITIONS.crash.toArray()} ref={crashRef} rotation={[0.18, 0, 0.15]}>
-        <Cymbal radius={0.28} matRef={crashMat} emissive="#ffaa33" />
+        <Cymbal radius={0.28} matRef={crashMat} emissive="#ffaa33" map={cymbalTex} />
       </group>
       <mesh position={[1.08, 0.67, 0.63]}>
         <cylinderGeometry args={[0.009, 0.012, 1.34, 8]} />
@@ -289,7 +298,7 @@ export function DrumKit() {
 
       {/* === RIDE === */}
       <group position={DRUM_POSITIONS.ride.toArray()} rotation={[0.15, 0, -0.12]}>
-        <Cymbal radius={0.32} />
+        <Cymbal radius={0.32} map={cymbalTex} />
       </group>
       <mesh position={[-1.16, 0.61, 0.7]}>
         <cylinderGeometry args={[0.009, 0.012, 1.22, 8]} />
@@ -298,15 +307,15 @@ export function DrumKit() {
 
       {/* === RACK TOMS — tilted toward the player === */}
       <group position={DRUM_POSITIONS.rackTom1.toArray()} rotation={[-0.28, 0, -0.08]}>
-        <ShellDrum radius={0.155} depth={0.16} />
+        <ShellDrum radius={0.155} depth={0.16} map={woodShellTex} />
       </group>
       <group position={DRUM_POSITIONS.rackTom2.toArray()} rotation={[-0.28, 0, 0.08]}>
-        <ShellDrum radius={0.17} depth={0.16} />
+        <ShellDrum radius={0.17} depth={0.16} map={woodShellTex} />
       </group>
 
       {/* === FLOOR TOM === */}
       <group position={DRUM_POSITIONS.floorTom.toArray()}>
-        <ShellDrum radius={0.22} depth={0.36} />
+        <ShellDrum radius={0.22} depth={0.36} map={woodShellTex} />
         <mesh position={[-0.16, -0.3, 0.1]}>
           <cylinderGeometry args={[0.008, 0.008, 0.32, 6]} />
           <meshStandardMaterial {...CHROME} />
@@ -340,6 +349,7 @@ function ShellDrum({
   radius,
   depth,
   shell = SHELL,
+  map,
   emissive = '#000000',
   matRef,
   lugs = 6,
@@ -349,6 +359,7 @@ function ShellDrum({
   radius: number
   depth: number
   shell?: { color: string; metalness: number; roughness: number; envMapIntensity?: number }
+  map?: THREE.Texture
   emissive?: string
   matRef?: React.Ref<THREE.MeshPhysicalMaterial>
   lugs?: number
@@ -363,6 +374,8 @@ function ShellDrum({
         <meshPhysicalMaterial
           ref={matRef}
           {...shell}
+          map={map}
+          color={map ? '#ffffff' : shell.color}
           clearcoat={clearcoat}
           clearcoatRoughness={clearcoatRoughness}
           emissive={emissive}
@@ -398,10 +411,12 @@ function Cymbal({
   radius,
   matRef,
   emissive = '#000000',
+  map,
 }: {
   radius: number
   matRef?: React.Ref<THREE.MeshStandardMaterial>
   emissive?: string
+  map?: THREE.Texture
 }) {
   return (
     <group>
@@ -410,6 +425,8 @@ function Cymbal({
         <meshStandardMaterial
           ref={matRef}
           {...CYMBAL}
+          map={map}
+          color={map ? '#ffffff' : CYMBAL.color}
           side={THREE.DoubleSide}
           emissive={emissive}
           emissiveIntensity={0}

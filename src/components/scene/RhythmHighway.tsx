@@ -8,8 +8,8 @@ import type { HitRating } from '@/types'
 const LANE_COLORS = ['#10b981', '#3b82f6', '#ef4444', '#f59e0b'] as const
 
 const HIT_Z = -0.25
-const FAR_Z = -5.5
-const HIGHWAY_Y = 1.82
+const FAR_Z = -1.7
+const HIGHWAY_Y = 1.15
 const LANE_WIDTH_NEAR = 1.8
 const LANE_WIDTH_FAR = 0.12
 const LANE_COUNT = 4
